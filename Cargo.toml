@@ -1,0 +1,7 @@
+[package]
+name = "spacer"
+version = "0.1.0"
+authors = ["Friz64"]
+
+[dependencies]
+clipboard = "*"
