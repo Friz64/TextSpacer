@@ -1,42 +1,32 @@
-extern crate clipboard;
-
-use clipboard::ClipboardProvider;
-use clipboard::ClipboardContext;
 use std::io::BufRead;
+use std::io::Write;
 
 fn main() {
-    // The string that's going to be outputted
-    let mut output = String::new();
+    loop {
+        let spaces: usize = match console_input("Spaces between each char").parse() {
+            Ok(spaces) => spaces,
+            Err(err) => {
+                println!("Failed to parse input: {}", err);
+                continue;
+            }
+        };
 
-    // Used for console Input
-    let reader = std::io::stdin();
+        let out = console_input("Text to be spaced").chars().map(|c| c.to_string() + &" ".repeat(spaces)).collect::<String>();
 
-    // Get the string that should be spaced from the console
-    println!("Text to be spaced: ");
-    let mut inputstring = reader.lock().lines().next().unwrap().unwrap();
+        println!("{}", out);
 
-    // Get the spaces that should be between each character from the console
-    println!("Spaces between each char: ");
-    let inputspaces: i32 = reader.lock().lines().next().unwrap().unwrap().parse().expect("input is not a number");
-
-    // Iterate through all characters in the input
-    // Add requested amount of spaces to each character and add it to the output
-    for curchar in inputstring.split("") {
-        output += &format!("{}{}", curchar, " ".repeat(inputspaces as usize))
+        println!("----------");
     }
+}
 
-    // remove the unnecessary spaces at the beginning and end of the output string
-    output = output.trim().to_string();
+fn console_input(prompt: &str) -> String {
+    print!("{}: ", prompt);
+    
+    let mut stdout = std::io::stdout();
+    stdout.flush().unwrap();
 
-    // simply print it out
-    println!("{}", output);
-
-    // set it to the clipboard with the clipboard crate
-    let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
-    ctx.set_contents(output.to_owned()).unwrap();
-    println!("\nSuccessfully set the output to the clipboard!");
-
-    // R     E     C     U     R     S     I     O     N
-    println!("\n----------\n");
-    main()
+    let reader = std::io::stdin();
+    let reader_lock = reader.lock();
+    let out = reader_lock.lines().next().unwrap().unwrap();
+    out
 }
